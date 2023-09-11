@@ -6,12 +6,12 @@ notes = {
 
 #12.1
 
-#title = input("Anteckning > ")
-#print(notes[title])
+title = input("Anteckning > ")
+print(notes[title])
 
 #12.2
 
-#print("ANTECKNINGAR")
-#for i in notes:
-#    print(f"- {i}")
+print("ANTECKNINGAR")
+for i in notes:
+    print(f"- {i}")
 
