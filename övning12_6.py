@@ -1,11 +1,8 @@
 import os
+import json
 
-notes = {
-"Meddelande från skolan": "Friluftsdag på tisdag",
-"Kom ihåg!": "Ta bilen till verkstad",
-"Inför tentamen": "Gör alla instuderingsuppgifter",
-"one": "two"
-}
+with open('dictionaryNotes.json', 'r') as file:
+    notes = json.load(file)
 
 def printUI():
     print(".: ALWAYSNOTE :.")
@@ -25,23 +22,31 @@ while True:
     userChoice = input("menu >")
     if userChoice == "v":
         userValue = input("> ")
-        print(notes[userValue]) #funkar nte
-        print("Tryck enter för att förstätta...")
+        if userValue in notes:
+            print(notes[userValue])
+            input("Tryck enter för att förstätta...")
+        else:
+            print("Ogiltig kommand!")
+            input("Tryck enter för att förstätta...")
     elif userChoice == "a":
         userValue = input("Ange titel: ")
         userKey = input("Ange text: ")
         notes[userValue] = userKey
+        with open('dictionaryNotes.json', 'w') as file:
+            json.dump(notes, file) 
         os.system("clear")
         printUI()
-        print("Tryck enter för att förstätta...")
+        input("Tryck enter för att förstätta...")
     elif userChoice == "r":
         userValue = input("Ange titel som du vill radera: ")
         notes.pop(userValue)
+        with open('dictionaryNotes.json', 'w') as file:
+            json.dump(notes, file) 
         os.system("clear")
         printUI()
-        print("Tryck enter för att förstätta...")
+        input("Tryck enter för att förstätta...")
     elif userChoice == "e":
         exit()
     else:
         print("Ogiltig kommand!")
-        print("Tryck enter för att förstätta...")
+        input("Tryck enter för att förstätta...")
