@@ -2,12 +2,25 @@ import requests
 import json
 import pprint
 
+def UI():
+    print("--- ARTIST DB ---")
+    print("Ariana Grande")
+    print("Avicii")
+    print("Blink -182")
+    print("Brad Paisley")
+    print("Ed Sheeran")
+    print("Imagine Dragons")
+    print("Maroon 5")
+    print("Scorpions")
+    print("-----------------")
+
 url = "https://5hyqtreww2.execute-api.eu-north-1.amazonaws.com/artists/"
 
 r = requests.get(url) #fetching into
 response_string = r.text #taking info from the website and saving it as text
 response_dictionary = json.loads(r.text) #turning this into a dict
 
+UI()
 userArtist = input("Input the name of the artist: ")
 
 for artist in response_dictionary["artists"]:
