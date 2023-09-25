@@ -3,10 +3,13 @@ class Account:
     def __init__(self, owner, balance, debit, account_id, pin_code):
         self.owner = owner
         self.balance = balance
-        self.debit = bool(debit) #True = debit, annars = kredit
+        #True om debit, False om kredit
+        #Debit/Kredit används inte i programmet alls, men ni kan utveckla funktioner så att egenskapen är relevant
+        self.debit = bool(debit) 
         self.account_id = account_id
         self.pin_code=pin_code
 
+    #lyckades inte implementera detta ännu, programmet kräver bara account_id att få tillgång till konto
     def get_access(self): 
         password_input = input("Input your pin-code: (Must be 4 numbers)")
         try:
@@ -52,6 +55,7 @@ class Account:
         except ValueError:
             print("Invalid number.")
 
+#de kan vi ha i en separat json fil och spara
 accounts = [
     Account("Åsa Åström", 10000, True, 121212, 1212),
     Account("Elsa Eriksson", 5500, True, 234567, 3456),
