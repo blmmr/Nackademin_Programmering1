@@ -129,7 +129,12 @@ def main_UI(account):
 logged_in_account = login_UI()
 if logged_in_account:
     main_UI(logged_in_account)
-else:
-    print("Account not found.")
+    
+"""
+else användes inte, programmet återgår till föregående else
+else: 
+    print("Account not found.") 
 
-main_UI()
+funktionen anropas utan argument, räcker med föregående argument (logged_in_account)
+main_UI() 
+"""
