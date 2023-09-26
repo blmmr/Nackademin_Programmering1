@@ -59,6 +59,7 @@ class Account:
         print("Thank you for using our services!")
         print("=================================")
 
+
 # de kan vi ha i en separat json fil och spara
 accounts = [
     Account("Åsa Åström", 10000, True, 121212, 1212),
@@ -105,8 +106,11 @@ def login_UI():
             for account in accounts:
                 if user_pincode == str(account.pin_code):
                     return account
+                elif user_pincode != str(account.pin_code):  # fel pin code
+                    return print("Pin code incorrect.")
         else:
-            return None
+            return print("Account not found.")  # Konto-ID hittades inte
+
 
 
 def main_UI(account):
@@ -119,7 +123,8 @@ def main_UI(account):
             print("[w]ithdraw")
             print("[d]eposit")
             print("[q]uit")
-            action = input("Select an action: ").lower() # Metod för att undvika logiska fel vid inmatning av stora bokstäver
+            action = input(
+                "Select an action: ").lower()  # Metod för att undvika logiska fel vid inmatning av stora bokstäver
             if action == 'c':
                 account.get_balance()
             elif action == 'w':
@@ -136,4 +141,3 @@ def main_UI(account):
 logged_in_account = login_UI()
 if logged_in_account:
     main_UI(logged_in_account)
-
