@@ -1,16 +1,16 @@
-#bank app
+# bank app
 class Account:
     def __init__(self, owner, balance, debit, account_id, pin_code):
         self.owner = owner
         self.balance = balance
-        #True om debit, False om kredit
-        #Debit/Kredit används inte i programmet alls, men ni kan utveckla funktioner så att egenskapen är relevant
-        self.debit = bool(debit) 
+        # True om debit, False om kredit
+        # Debit/Kredit används inte i programmet alls, men ni kan utveckla funktioner så att egenskapen är relevant
+        self.debit = bool(debit)
         self.account_id = account_id
-        self.pin_code=pin_code
+        self.pin_code = pin_code
 
-    #lyckades inte implementera detta ännu, programmet kräver bara account_id att få tillgång till konto
-    def get_access(self): 
+    # lyckades inte implementera detta ännu, programmet kräver bara account_id att få tillgång till konto
+    def get_access(self):
         password_input = input("Input your pin-code: (Must be 4 numbers)")
         try:
             password_input = int(password_input)
@@ -22,20 +22,19 @@ class Account:
         except ValueError:
             print("Please enter valid values.")
 
-
     def get_balance(self):
         print(f"{self.owner}, your account balance: {self.balance} SEK")
 
     def withdraw(self):
-        amount=input("The sum to withdraw: ")
+        amount = input("The sum to withdraw: ")
         try:
-            amount=int(amount)
+            amount = int(amount)
             if amount < 0:
                 print("Cannot be negative")
             elif amount > self.balance:
                 print(f"Cannot withdraw more than {self.balance}")
             else:
-                self.balance-=amount
+                self.balance -= amount
                 print(f"{amount} SEK withdrawn.")
                 self.get_balance()
         except ValueError:
@@ -43,19 +42,24 @@ class Account:
 
     def deposit(self):
         print("Please place the money in the machine.")
-        amount=input("How much was put?")
+        amount = input("How much was put?")
         try:
-            amount=int(amount)
+            amount = int(amount)
             if amount < 0:
                 print("To withdraw the money from the account, use the Withdraw function.")
             else:
-                self.balance+=amount
+                self.balance += amount
                 print(f"{amount} SEK deposited.")
                 self.get_balance()
         except ValueError:
             print("Invalid number.")
 
-#de kan vi ha i en separat json fil och spara
+    def quit(self):  # Funktionen för att avsluta programmet
+        print("=================================")
+        print("Thank you for using our services!")
+        print("=================================")
+
+# de kan vi ha i en separat json fil och spara
 accounts = [
     Account("Åsa Åström", 10000, True, 121212, 1212),
     Account("Elsa Eriksson", 5500, True, 234567, 3456),
@@ -89,11 +93,12 @@ accounts = [
     Account("Linnea Lindström", 6200, True, 123456, 2345)
 ]
 
+
 def login_UI():
     print("*" * 20)
     print("* STOCKHOLM BANK *")
     print("*" * 20)
-    user_id=input("To log in, enter your id: ")
+    user_id = input("To log in, enter your id: ")
     for account in accounts:
         if user_id == str(account.account_id):
             user_pincode = input("Enter your pin code: ")
@@ -102,6 +107,7 @@ def login_UI():
                     return account
         else:
             return None
+
 
 def main_UI(account):
     if account:
@@ -113,7 +119,7 @@ def main_UI(account):
             print("[w]ithdraw")
             print("[d]eposit")
             print("[q]uit")
-            action = input("Select an action: ")
+            action = input("Select an action: ").lower() # Metod för att undvika logiska fel vid inmatning av stora bokstäver
             if action == 'c':
                 account.get_balance()
             elif action == 'w':
@@ -121,6 +127,7 @@ def main_UI(account):
             elif action == 'd':
                 account.deposit()
             elif action == 'q':
+                account.quit()  # Anropar funktionen för att avsluta programmet
                 break
             else:
                 print("Invalid action. Please select a valid option.")
@@ -129,7 +136,4 @@ def main_UI(account):
 logged_in_account = login_UI()
 if logged_in_account:
     main_UI(logged_in_account)
-else:
-    print("Account not found.")
 
-main_UI()
