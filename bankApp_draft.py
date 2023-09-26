@@ -62,36 +62,36 @@ class Account:
 
 # de kan vi ha i en separat json fil och spara
 accounts = [
-    Account("Åsa Åström", 10000, True, 121212, 1212),
-    Account("Elsa Eriksson", 5500, True, 234567, 3456),
-    Account("Olle Olsson", 32000, True, 987654, 7890),
-    Account("Maja Malmström", 7500, True, 567890, 1234),
-    Account("Gustav Gustafsson", 15000, True, 345678, 5678),
-    Account("Sara Svensson", 2800, True, 456789, 2345),
-    Account("Karl Karlsson", 9000, True, 789012, 6789),
-    Account("Emma Engström", 42000, True, 345678, 1234),
-    Account("Nils Nilsson", 6200, True, 123456, 3456),
-    Account("Anna Andersson", 10500, True, 567890, 7890),
-    Account("Per Persson", 2000, True, 987654, 2345),
-    Account("Linnéa Lindberg", 17500, True, 234567, 5678),
-    Account("Anders Åberg", 8800, True, 345678, 1234),
-    Account("Ida Isaksson", 44000, True, 121212, 3456),
-    Account("Erik Eriksson", 6000, True, 789012, 5678),
-    Account("Maria Månsson", 3100, True, 345678, 7890),
-    Account("Johan Johansson", 8700, True, 567890, 2345),
-    Account("Linda Larsson", 12300, True, 987654, 1234),
-    Account("Andreas Andersson", 9300, True, 567890, 5678),
-    Account("Karin Karlsson", 42000, True, 345678, 2345),
-    Account("David Dahlström", 7000, True, 123456, 1234),
-    Account("Anna Andersson", 12500, True, 567890, 3456),
-    Account("Peter Persson", 8800, True, 345678, 2345),
-    Account("Sofia Svensson", 4800, True, 234567, 5678),
-    Account("Jonas Johansson", 11000, True, 345678, 1234),
-    Account("Emma Eriksson", 19000, True, 987654, 7890),
-    Account("Lars Larsson", 7700, True, 567890, 3456),
-    Account("Hanna Holm", 8600, True, 234567, 1234),
-    Account("Mikael Mårtensson", 42000, True, 345678, 5678),
-    Account("Linnea Lindström", 6200, True, 123456, 2345)
+    Account("Åsa Åström", 10000, True, 157838, 9885),
+    Account("Elsa Eriksson", 5500, True, 197606, 6214),
+    Account("Olle Olsson", 32000, True, 346709, 2507),
+    Account("Maja Malmström", 7500, True, 231046, 6302),
+    Account("Gustav Gustafsson", 15000, True, 564293, 9149),
+    Account("Sara Svensson", 2800, True, 157507, 9123),
+    Account("Karl Karlsson", 9000, True, 328400, 7465),
+    Account("Emma Engström", 42000, True, 963078, 7619),
+    Account("Nils Nilsson", 6200, True, 404388, 2008),
+    Account("Anna Andersson", 10500, True, 331646, 7345),
+    Account("Per Persson", 2000, True, 221171, 1255),
+    Account("Linnéa Lindberg", 17500, True, 272883, 7328),
+    Account("Anders Åberg", 8800, True, 494224, 5203),
+    Account("Ida Isaksson", 44000, True, 681794, 1164),
+    Account("Erik Eriksson", 6000, True, 994270, 1856),
+    Account("Maria Månsson", 3100, True, 244977, 5595),
+    Account("Johan Johansson", 8700, True, 914766, 4396),
+    Account("Linda Larsson", 12300, True, 684010, 2586),
+    Account("Andreas Andersson", 9300, True, 653698, 2316),
+    Account("Karin Karlsson", 42000, True, 378913, 1989),
+    Account("David Dahlström", 7000, True, 326565, 4576),
+    Account("Anna Andersson", 12500, True, 719667, 8096),
+    Account("Peter Persson", 8800, True, 488449, 3564),
+    Account("Sofia Svensson", 4800, True, 175489, 9081),
+    Account("Jonas Johansson", 11000, True, 739594, 2754),
+    Account("Emma Eriksson", 19000, True, 349790, 6433),
+    Account("Lars Larsson", 7700, True, 227997, 6902),
+    Account("Hanna Holm", 8600, True, 611915, 2978),
+    Account("Mikael Mårtensson", 42000, True, 704174, 6287),
+    Account("Linnea Lindström", 6200, True, 702902, 7469)
 ]
 
 
@@ -99,17 +99,24 @@ def login_UI():
     print("*" * 20)
     print("* STOCKHOLM BANK *")
     print("*" * 20)
-    user_id = input("To log in, enter your id: ")
+    user_id = int(input("To log in, enter your id: "))
+    pin_code_tries = 3
+
     for account in accounts:
-        if user_id == str(account.account_id):
-            user_pincode = input("Enter your pin code: ")
-            for account in accounts:
-                if user_pincode == str(account.pin_code):
-                    return account
-                elif user_pincode != str(account.pin_code):  # fel pin code
-                    return print("Pin code incorrect.")
-        else:
-            return print("Account not found.")  # Konto-ID hittades inte
+        if user_id == int(account.account_id):
+            while pin_code_tries > 0:
+                user_pincode = input("Enter your pin code: ")
+                for account in accounts:
+                    if user_pincode == str(account.pin_code):
+                        return account
+                else:   # fel pin code
+                        pin_code_tries -= 1
+                        if pin_code_tries == 0:
+                            return print("You have entered the wrong pin code too many times. Your account has been locked.")
+                        print(f"Pin code incorrect. You have {pin_code_tries} tries left.")
+                        continue
+    else:
+        return print("Account not found.")  # Konto-ID hittades inte
 
 
 
