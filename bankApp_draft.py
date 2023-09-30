@@ -1,17 +1,19 @@
-# bank app
+# Kontoinformation
 import json
+import datetime
 
 
-class Account:
-    def __init__(self, owner, account_id, pin_code, balance,
-                 debit):  # debit/Kredit används inte i programmet alls, men ni kan utveckla funktioner så att egenskapen är relevant
+class AccountInfo:
+    def __init__(self, owner, account_id, pin_code, balance):
         self.owner = owner
         self.account_id = account_id
         self.pin_code = pin_code
         self.balance = balance
-        self.debit = debit
 
-    def get_owner(self):  # Igor lade till dessa 3, jag själv vet inte vad de är till men kan ni förklara?
+    # get används för att kapsla in klassparametrarna och säkerställa att dessa data inte ändras. Det är en del av objektorientering.
+    # vi skulle kunna använda också set i fall av parametrar som behöver ändras
+
+    def get_owner(self):
         return self.owner
 
     def get_account_id(self):
@@ -21,10 +23,11 @@ class Account:
         return self.pin_code
 
     def get_balance(self):
-        print(f"{self.owner}, your account balance: {self.balance} SEK")
+        print(f"{self.owner}, your account balance is: {self.balance} SEK")
 
     def withdraw(self):
-        amount = input("Enter the amount to withdraw: ")
+        amount = input(
+            "Enter the amount to withdraw: ").strip()  # metod för att undvika logiska fel vid inmatning av mellanrum
         try:
             amount = int(amount)
             if amount < 0:
@@ -33,18 +36,19 @@ class Account:
                 print(f"Cannot withdraw more than your account balance which is: {self.balance} SEK")
             else:
                 self.balance -= amount
-                print(f"{amount} SEK withdrawn.")
+                print(f"{amount} SEK was successfully withdrawn from your account.")
                 self.get_balance()
         except ValueError:
             print("Invalid input. Please enter a valid number.")
 
     def deposit(self):
-        amount = input("Enter the amount to deposit: ")
+        amount = input(
+            "Enter the amount to deposit: ").strip()  # metod för att undvika logiska fel vid inmatning av mellanrum
         print("Please place the money in the machine.")
         try:
             amount = int(amount)
             if amount < 0:
-                print("Cannot deposit a negative amount on .")
+                print("Cannot deposit a negative amount on.")
             else:
                 self.balance += amount
                 print(f"{amount} SEK was successfully deposited in your account.")
@@ -52,102 +56,96 @@ class Account:
         except ValueError:
             print("Invalid input. Please enter a valid number.")
 
-    def record_debit(self, amount):
-        if amount > 0:
-            self.debit.append(amount)
+    def quit(self):  # funktionen för att avsluta programmet
+        return self.quit
 
-    def get_debit(self):
-        if self.debit:
-            print(f"Debit History for {self.owner}:")
-            for i, amount in enumerate(self.debit, start=1):
-                print(f"{i}. {amount} SEK")
-        else:
-            print("No debit history available.")
 
-    def load_accounts():
-        try:
-            with open("accountlist.json", "r") as file:
-                data = json.load(file)
+# json filen
+def load_accounts():
+    try:
+        with open("accountlist2.json", "r", encoding="utf-8") as file:  # encoding="utf-8" undviker bokstavsförvrängning vid utskrift av listan
+            data = json.load(file)
 
-            for account_data in data:
-                if "debit" not in account_data:
-                    account_data["debit"] = []
+        return [AccountInfo(account_data["owner"], account_data["account_id"], account_data["pin_code"],
+                            account_data["balance"]) for account_data in data]
+    except FileNotFoundError:
+        return []
 
-            return [Account(account_data["owner"], account_data["account_id"], account_data["pin_code"],
-                            account_data["balance"], account_data["debit"]) for account_data in data]
-        except FileNotFoundError:
-            return []
 
-    def save_accounts(accounts):
-        data = [{"owner": account.owner, "account_id": account.account_id, "pin_code": account.pin_code,
-                 "balance": account.balance, "debit": account.debit}
-                for account in accounts]
-        with open("accountlist.json", "w") as file:
-            json.dump(data, file, indent=5)
+def save_accounts(accounts):
+    data = [{"owner": account.owner, "account_id": account.account_id, "pin_code": account.pin_code,
+             "balance": account.balance}
+            for account in accounts]
+    with open("accountlist2.json", "w") as file:
+        json.dump(data, file, indent=5)
 
-    def login_UI():
-        print("*" * 20)
-        print("* STOCKHOLM BANK *")
-        print("*" * 20)
-        accounts = Account.load_accounts()
-        user_id = int(input("To log in, enter your id: "))
-        pin_code_tries = 3
 
-        for account in accounts:
-            if user_id == int(account.account_id):
-                while pin_code_tries > 0:
-                    user_pincode = input("Enter your pin code: ")
-                    for account in accounts:
-                        if user_pincode == str(account.pin_code):
-                            return account
-                    else:  # fel pin code, avslutar programmet nu men kan utvecklas mer så att kontot låses t.ex.
-                        pin_code_tries -= 1
-                        if pin_code_tries == 0:
-                            print("You have entered the wrong pin code too many times. Your account has been locked.")
-                            return Account.login_UI()
-                        print(f"Pin code incorrect. You have {pin_code_tries} tries left.")
-                        continue
-        else:
-            print("*" * 20)
-            print("Account not found.")  # Konto-ID hittades inte
-            print("*" * 20)
-            print("Try again.")
-            return Account.login_UI()  # fortsätt med begäran och ange ID
+accounts = load_accounts()
 
-    def quit(self):  # Funktionen för att avsluta programmet
-        print("=================================")
-        print("Thank you for using our services!")
-        print("=================================")
+
+def login_UI(accounts):
+    print("*" * 60)
+    print("*" + "STOCKHOLM BANK MENU".center(58) + "*")
+    print("*" * 60)
+    user_id = input("To log in, enter your account id: ").strip()
+    pin_code_tries = 3
+
+    for account in accounts:
+        if user_id == str(account.get_account_id()):
+            while pin_code_tries > 0:
+                user_pincode = input("Enter your pin code: ").strip()
+                for account in accounts:
+                    if user_pincode == str(account.get_pin_code()):
+                        return account
+                else:  # fel pin code, avslutar programmet nu men kan utvecklas mer så att kontot låses t.ex.
+                    pin_code_tries -= 1
+                    if pin_code_tries == 0:
+                        return print(
+                            "You have entered the wrong pin code too many times. \nYour account has been locked.")
+                    print(f"Pin code incorrect. You have {pin_code_tries} tries left.")
+                    continue
+    else:
+        print("=" * 60)
+        print("Account not found. Try again.")  # Konto-ID hittades inte
+        return login_UI(accounts)  # fortsätt med begäran och ange ID
 
 
 def main_UI(account):
     if account:
-        print(f"Welcome, {account.owner}")
+        print(f"Welcome, {account.get_owner()}")
         while True:
-            print("*" * 20)
+            print("=" * 60)
             print("ACTIONS:")
-            print("[c]heck balance")
-            print("[w]ithdraw")
-            print("[d]eposit")
-            print("[h]istory")
-            print("[q]uit")
+            print("=" * 60)
+            print("[C]heck balance")
+            print("=" * 60)
+            print("[W]ithdraw")
+            print("=" * 60)
+            print("[D]eposit")
+            print("=" * 60)
+            print("[Q]uit")
+            print("=" * 60)
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # datum och tid (realtid)
+            print(f"Current Date & Time: {current_time}")
             action = input(
-                "Select an action: ").lower()  # Metod för att undvika logiska fel vid inmatning av stora bokstäver
-            if action == 'c':
+                "Select an action: ").strip().upper()  # metod för att undvika logiska fel vid inmatning av mellanrum och stora bokstäver
+            if action == 'C':
                 account.get_balance()
-            elif action == 'w':
+            elif action == 'W':
                 account.withdraw()
-            elif action == 'd':
+            elif action == 'D':
                 account.deposit()
-            elif action == 'h':
-                account.get_debit()
-            elif action == 'q':
-                account.quit()  # Anropar funktionen för att avsluta programmet
+            elif action == 'Q':
+                account.quit()  # anropar funktionen för att avsluta programmet
+                print("=" * 60)
+                print("Thank you for using our services!")
+                print("=" * 60)
                 break
             else:
+                print("=" * 60)
                 print("Invalid action. Please select a valid option.")
 
 
-logged_in_account = Account.login_UI()
+logged_in_account = login_UI(accounts)
 if logged_in_account:
     main_UI(logged_in_account)
