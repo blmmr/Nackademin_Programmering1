@@ -1,6 +1,6 @@
-# Kontoinformation
 import json
 import datetime
+import time
 
 
 class AccountInfo:
@@ -9,9 +9,6 @@ class AccountInfo:
         self.account_id = account_id
         self.pin_code = pin_code
         self.balance = balance
-
-    # get används för att kapsla in klassparametrarna och säkerställa att dessa data inte ändras. Det är en del av objektorientering.
-    # vi skulle kunna använda också set i fall av parametrar som behöver ändras
 
     def get_owner(self):
         return self.owner
@@ -23,47 +20,50 @@ class AccountInfo:
         return self.pin_code
 
     def get_balance(self):
-        print(f"{self.owner}, your account balance is: {self.balance} SEK")
+        print(f"Your current balance is: {self.balance} SEK")  # borttagning av användarnamnet
 
     def withdraw(self):
-        amount = input(
-            "Enter the amount to withdraw: ").strip()  # metod för att undvika logiska fel vid inmatning av mellanrum
+        amount = input("Enter the amount to withdraw: ").strip()
         try:
             amount = int(amount)
             if amount < 0:
                 print("Cannot withdraw a negative amount.")
+                print("Please enter a whole number.")  # Endast heltal
+                self.withdraw()  # jag tog bort balance för att återgå till frågan vid negative fel.
             elif amount > self.balance:
                 print(f"Cannot withdraw more than your account balance which is: {self.balance} SEK")
             else:
                 self.balance -= amount
-                print(f"{amount} SEK was successfully withdrawn from your account.")
+                print(f"{amount} SEK was successfully withdrawn from your account!")
                 self.get_balance()
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print("Invalid input. Please enter a whole number.")  # Endast heltal
+            self.withdraw()  # återgå till samma fråga efter felaktig inmatning
 
     def deposit(self):
-        amount = input(
-            "Enter the amount to deposit: ").strip()  # metod för att undvika logiska fel vid inmatning av mellanrum
-        print("Please place the money in the machine.")
+        amount = input("Enter the amount to deposit: ").strip()
         try:
             amount = int(amount)
             if amount < 0:
                 print("Cannot deposit a negative amount on.")
             else:
+                print("Please place the money in the machine wait a few seconds..⌛")
+                time.sleep(3)  # metod för att fördröja
                 self.balance += amount
-                print(f"{amount} SEK was successfully deposited in your account.")
+                print(f"{amount} SEK was successfully deposited in your account!")
                 self.get_balance()
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print("Invalid input. Please enter a whole number.")
+            self.deposit()  # återgå till samma fråga efter felaktig inmatning
 
-    def quit(self):  # funktionen för att avsluta programmet
+    def quit(self):
         return self.quit
 
 
 # json filen
 def load_accounts():
     try:
-        with open("accountlist2.json", "r", encoding="utf-8") as file:  # encoding="utf-8" undviker bokstavsförvrängning vid utskrift av listan
+        with open("accountlist2.json", "r", encoding="utf-8") as file:
             data = json.load(file)
 
         return [AccountInfo(account_data["owner"], account_data["account_id"], account_data["pin_code"],
@@ -72,10 +72,10 @@ def load_accounts():
         return []
 
 
-def save_accounts(accounts):
+def save_accounts(clients):
     data = [{"owner": account.owner, "account_id": account.account_id, "pin_code": account.pin_code,
              "balance": account.balance}
-            for account in accounts]
+            for account in clients]
     with open("accountlist2.json", "w") as file:
         json.dump(data, file, indent=5)
 
@@ -83,20 +83,20 @@ def save_accounts(accounts):
 accounts = load_accounts()
 
 
-def login_UI(accounts):
+def login_ui(client):
     print("*" * 60)
     print("*" + "STOCKHOLM BANK MENU".center(58) + "*")
     print("*" * 60)
     user_id = input("To log in, enter your account id: ").strip()
     pin_code_tries = 3
 
-    for account in accounts:
+    for account in client:
         if user_id == str(account.get_account_id()):
             while pin_code_tries > 0:
                 user_pincode = input("Enter your pin code: ").strip()
-                for account in accounts:
-                    if user_pincode == str(account.get_pin_code()):
-                        return account
+                # Jag tog bort en for loop härifrån eftersom vi redan är inne i for loopen
+                if user_pincode == str(account.get_pin_code()):
+                    return account
                 else:  # fel pin code, avslutar programmet nu men kan utvecklas mer så att kontot låses t.ex.
                     pin_code_tries -= 1
                     if pin_code_tries == 0:
@@ -107,10 +107,10 @@ def login_UI(accounts):
     else:
         print("=" * 60)
         print("Account not found. Try again.")  # Konto-ID hittades inte
-        return login_UI(accounts)  # fortsätt med begäran och ange ID
+        return login_ui(client)  # fortsätt med begäran och ange ID
 
 
-def main_UI(account):
+def main_ui(account):
     if account:
         print(f"Welcome, {account.get_owner()}")
         while True:
@@ -127,8 +127,7 @@ def main_UI(account):
             print("=" * 60)
             current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # datum och tid (realtid)
             print(f"Current Date & Time: {current_time}")
-            action = input(
-                "Select an action: ").strip().upper()  # metod för att undvika logiska fel vid inmatning av mellanrum och stora bokstäver
+            action = input("Select an action: ").strip().upper()
             if action == 'C':
                 account.get_balance()
             elif action == 'W':
@@ -136,7 +135,7 @@ def main_UI(account):
             elif action == 'D':
                 account.deposit()
             elif action == 'Q':
-                account.quit()  # anropar funktionen för att avsluta programmet
+                account.quit()
                 print("=" * 60)
                 print("Thank you for using our services!")
                 print("=" * 60)
@@ -146,6 +145,6 @@ def main_UI(account):
                 print("Invalid action. Please select a valid option.")
 
 
-logged_in_account = login_UI(accounts)
+logged_in_account = login_ui(accounts)
 if logged_in_account:
-    main_UI(logged_in_account)
+    main_ui(logged_in_account)
