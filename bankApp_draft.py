@@ -47,7 +47,7 @@ class AccountInfo:
             if amount < 0:
                 print("Cannot deposit a negative amount on.")
             else:
-                print("Please place the money in the machine wait a few seconds..⌛")
+                print("Please place the money in the machine and wait a few\nseconds...⌛")
                 time.sleep(3)  # metod för att fördröja
                 self.balance += amount
                 print(f"{amount} SEK was successfully deposited in your account!")
